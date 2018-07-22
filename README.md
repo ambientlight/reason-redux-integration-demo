@@ -26,7 +26,7 @@ A simple and reasonable approach is [wrap our reason component](https://reasonml
 
 [FilenameLabel.re](src/components/FilenameLabel/FilenameLabel.re)
 
-```re
+```reason
 let component = ReasonReact.statelessComponent("FilenameLabel");
 
 let make = (~filename, ~className, _children) => {
@@ -94,7 +94,7 @@ export interface PauseAction extends Action {
 
 Discriminated union (a.k.a. [variant](https://reasonml.github.io/docs/en/variant.html)) is a build-in data structure in reason, and thus we can model the above thing as:
 
-```re
+```reason
 type mediaAction = 
   | Play(string)
   | Pause(string);
@@ -102,7 +102,7 @@ type mediaAction =
 
 Alright, but now we want that our `mediaAction` actually maps to the above thing, so we can handle these actions in our existing reducers on js/ts side and debug in [redux-dev-tools](https://github.com/zalmoxisus/redux-devtools-extension), but since for now [bucklescript](https://bucklescript.github.io) (ocalm-to-js compiler) cannot directly map variants to js-objects, we need to do the conversion ourselves. We utilize [glennsl/bs-json](https://github.com/glennsl/bs-json) for this purpose ([resourceListAction.re](src/redux/actions/resourceListAction.re)):
 
-```re
+```reason
 type mediaAction = 
   | Play(string)
   | Pause(string);
@@ -138,7 +138,7 @@ let fromJs = js => js |> Decode.mediAction;
 
 And thus we can then dispatch actions like:
 
-```re
+```reason
 dispatch(Play("my_media.mov") |> toJs)
 ```
 
@@ -146,7 +146,7 @@ dispatch(Play("my_media.mov") |> toJs)
 
 Utilize `[bs.deriving abstract]` ([resourceListState.re](src/redux/state/resourceListState.re)).
 
-```re
+```reason
 [@bs.deriving abstract]
 type state = {
     resourcePaths: list(string),
@@ -161,7 +161,7 @@ let initial = () => state(
 
 Add it to our root state as any other substate, providing type definitions ([root.ts](src/redux/state/root.ts)):
 
-```re
+```reason
 import * as MediaState from './media'
 const ResourceListState = require('reason/redux/state/resourceListState.bs').initial
 
@@ -184,7 +184,7 @@ export const initial: () => Root = () => ({
 
 Same as our js/ts reducer, though we need to convert action back to variant ([resourceListReducer.re](src/redux/reducers/resourceListReducer.re)):
 
-```re
+```reason
 open List
 open ResourceListState
 open ResourceListAction
@@ -218,7 +218,7 @@ let reducer = (~lastState=initial(), ~action: Js.Json.t) =>
 
 Add it to our root reducer as any other substate reducer ([root.ts](src/redux/reducers/root.ts)):
 
-```re
+```reason
 import { combineReducers } from 'redux'
 import * as State from '../state'
 import { media } from './media'
@@ -233,7 +233,7 @@ export const root = combineReducers<State.Root>({
 ### Component
 On reason side we now can call `connect`, given that we have added the `react-redux` [bucklescript binding](src/bs-bindings/ReactRedux.re):
 
-```re
+```reason
 type mapStateToProps('state, 'props, 'connectedStateProps) = (. 'state, 'props) => 'connectedStateProps;
 type mapDispatchToProps('action, 'props, 'connectedDispatchProps) = (. (. 'action) => unit, 'props) => 'connectedDispatchProps;
 
@@ -246,7 +246,7 @@ external connect: (
 
 We also need to provide type definitions for the partial state that we want our reason code to access ([rootState.re](src/redux/state/rootState.re)):
 
-```re
+```reason
 [@bs.deriving abstract]
 type media = {
     sourceIdentifier: Js.Nullable.t(string)
@@ -261,7 +261,7 @@ type root = {
 
 And thus in our reason component ([ResourceList.re](src/components/ResourceList/ResourceList.re)):
 
-```re
+```reason
 [@bs.deriving abstract]
 type stateProps = {
   resourcePaths: list(string),
