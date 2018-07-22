@@ -341,13 +341,13 @@ in your `webpack.config.babel.js`:
 
 ```js
 {
-	// webpack config
-	resolve: {
-		alias: {
-      		reason: path.resolve(__dirname, "lib/js/src"),
-      		src: path.resolve(__dirname, "src")
-   		}
-	}
+  // webpack config
+  resolve: {
+    alias: {
+      reason: path.resolve(__dirname, "lib/js/src"),
+      src: path.resolve(__dirname, "src")
+    }
+  }
 }
 ```
 
@@ -355,12 +355,12 @@ in your `tsconfig.json`:
 
 ```json
 {
-	"compilerOptions": {
-		"paths": {
-   			"reason": ["lib/js/src"],
-   			"src": ["src"]
-    		}
-	}
+  "compilerOptions": {
+    "paths": {
+      "reason": ["lib/js/src"],
+      "src": ["src"]
+     }
+   }
 }
 ```
 
