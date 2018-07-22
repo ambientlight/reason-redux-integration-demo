@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Webpack Dev Server",
+            "type": "shell",
+            "command": "./node_modules/.bin/webpack --config webpack.config.babel.js --env.development && ./node_modules/.bin/webpack-dev-server --hot --env.development",
+            "windows": {
+                "command": "./node_modules/.bin/webpack --config webpack.config.babel.js --env.development && ./node_modules/.bin/webpack-dev-server --hot --env.development"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Bucklescript Build Incremental",
+            "type": "shell",
+            "command": "bsb -make-world -w",
+            "windows": {
+                "command": "bsb -make-world -w"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
