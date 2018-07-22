@@ -355,12 +355,11 @@ in your `tsconfig.json`:
 
 ```json
 {
-	// tsconfig
 	"compilerOptions": {
 		"paths": {
    			"reason": ["lib/js/src"],
    			"src": ["src"]
-    	}
+    		}
 	}
 }
 ```
