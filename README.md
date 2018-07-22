@@ -7,7 +7,7 @@ Example that demonstrates integration of [reason](https://reasonml.github.io) in
 * [material-ui](https://material-ui.com)
 * [styled-components](https://www.styled-components.com) (css-in-js)
 
-App is a minimal electron video player with reason used to implement [Recent Videos]() component.
+App is a minimal electron video player with reason used to implement [Recent Videos](src/components/ResourceList/ResourceList.re) component.
 
 ![](readme_assets/sample.png)
 
