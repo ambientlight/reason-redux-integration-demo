@@ -142,7 +142,7 @@ And thus we can then dispatch actions like:
 dispatch(Play("my_media.mov") |> toJs)
 ```
 
-###Substate
+### Substate
 
 Utilize `[bs.deriving abstract]` ([resourceListState.re](src/redux/state/resourceListState.re)).
 
