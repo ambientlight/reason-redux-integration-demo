@@ -104,8 +104,8 @@ Alright, but now we want that our `mediaAction` actually maps to the above thing
 
 ```
 type mediaAction = 
-	| Play(string)
-	| Pause(string);
+   | Play(string)
+   | Pause(string);
 
 module Decode = {
   open Json.Decode;
