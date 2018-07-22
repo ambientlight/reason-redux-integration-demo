@@ -161,7 +161,7 @@ let initial = () => state(
 
 Add it to our root state as any other substate, providing type definitions ([root.ts](src/redux/state/root.ts)):
 
-```reason
+```ts
 import * as MediaState from './media'
 const ResourceListState = require('reason/redux/state/resourceListState.bs').initial
 
