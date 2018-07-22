@@ -218,7 +218,7 @@ let reducer = (~lastState=initial(), ~action: Js.Json.t) =>
 
 Add it to our root reducer as any other substate reducer ([root.ts](src/redux/reducers/root.ts)):
 
-```reason
+```ts
 import { combineReducers } from 'redux'
 import * as State from '../state'
 import { media } from './media'
@@ -312,7 +312,7 @@ npm install --save reason-react
 ```
 (4) Then place a **bsconfig.json** into root:
 
-```
+```json
 {
   "name": "react-template",
   "reason": {
