@@ -38,7 +38,8 @@ const config = target => env => {
             new webpack.DefinePlugin({
                 'process.env.NODE_ENV': JSON.stringify(env.production ? 'production' : 'development'),
                 ENVIRONMENT: JSON.stringify({
-                    isDev: !env.production
+                    isDev: !env.production,
+                    shouldHotReloadEpics: env.hotEpics !== undefined
                 })
             })
         ],

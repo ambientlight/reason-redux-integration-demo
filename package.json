@@ -5,7 +5,9 @@
   "main": "./app/dist/main.bundle.js",
   "scripts": {
     "dev": "bsb -make-world && ./node_modules/.bin/webpack --config webpack.config.babel.js --env.development && ./node_modules/.bin/webpack-dev-server --hot --env.development",
+    "_dev-hot-epics": "bsb -make-world && ./node_modules/.bin/webpack --config webpack.config.babel.js --env.development && ./node_modules/.bin/webpack-dev-server --hot --env.development --env.hotEpics",
     "bsb": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
     "build": "bsb -make-world && ./node_modules/.bin/webpack --config webpack.config.babel.js --env.production",
     "electron": "./node_modules/.bin/electron ./app/dist/main.bundle.js"
   },

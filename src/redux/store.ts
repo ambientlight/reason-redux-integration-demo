@@ -1,3 +1,5 @@
+import { BehaviorSubject } from 'rxjs/BehaviorSubject'
+import { switchMap } from 'rxjs/operators'
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import { persistStore, persistReducer, createMigrate } from 'redux-persist'
 
@@ -31,15 +33,24 @@ const configureStore = (history: History) => {
         persistReducer(persistConfig, root) as any, {},
         composeWithDevTools(
             applyMiddleware(
-                // middleware doesn't hot reload yet: reference https://github.com/reactjs/react-redux/issues/602 
                 epicMiddleware
             )
         )
     )
 
-    epicMiddleware.run(rootEpics)
+    const epic$ = new BehaviorSubject(rootEpics)
+    // Every time a new epic is given to epic$ it
+    // will unsubscribe from the previous one then
+    // call and subscribe to the new one because of
+    // how switchMap works
+    const hotReloadingEpic = (...args: any[]) => epic$.pipe(
+        switchMap(epic => epic(...args))
+    )
+
+    epicMiddleware.run(hotReloadingEpic as any)
+
     
-    // Enable Webpack hot module replacement for reducers
+    // Enable Webpack hot module replacement for reducers and middware(if needed)
     if (module.hot) {
         module.hot.accept('./reducers/root', () => {
             const rootReduceModule: RootReducerModule = require('./reducers/root')
@@ -47,6 +58,16 @@ const configureStore = (history: History) => {
                 persistReducer(persistConfig, rootReduceModule.root)
             );
         })
+
+        if(ENVIRONMENT.shouldHotReloadEpics){
+            console.log('Enabled hot reloading of epics')
+            module.hot.accept('./epics/root', () => {
+                const rootEpicsModule = require('./epics/root')
+                epic$.next(rootEpicsModule.rootEpics)
+            })
+        } else {
+            module.hot.decline('./epics/root')
+        }
     }
 
     return { store, persistor: persistStore(store) }

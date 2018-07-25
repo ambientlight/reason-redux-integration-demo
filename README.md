@@ -17,7 +17,8 @@ App is a minimal electron video player with reason used to implement [Recent Vid
 2. make sure you've installed [OCaml and Reason IDE extension](https://marketplace.visualstudio.com/items?itemName=freebroccolo.reasonml) for vscode or find one for your editor of choice: [Editor Plugins](https://reasonml.github.io/docs/en/editor-plugins)
 3. `npm install`
 4. `npm run bsb` for incremental builds of your reason code (or `Cmd+Shift+b` -> `b` -> `enter` in vscode)
-5. `npm run dev` to launch webpack-dev-server with hot-reload (or `Cmd+Shift+b` -> `w` -> `enter` in vscode)
+5. `npm run dev` to launch webpack-dev-server with hot-reload (or `Cmd+Shift+b` -> `w` -> `enter` in vscode)  
+**NOTE**: middleware (redux-observable epics) will not hot reload, please use `npm run _dev-hot-epics` for this purpose, but keep in mind that it is [GENERALLY UNSAFE](https://redux-observable.js.org/docs/recipes/HotModuleReplacement.html). 
 6. `npm run electron` to launch app. (or F5 in vscode)
 
 

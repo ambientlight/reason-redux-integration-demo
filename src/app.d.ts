@@ -1,3 +1,4 @@
 declare const ENVIRONMENT: {
-    isDev: boolean
+    isDev: boolean,
+    shouldHotReloadEpics: boolean
 }
