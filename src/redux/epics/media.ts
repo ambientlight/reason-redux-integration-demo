@@ -99,6 +99,7 @@ const play = (action$: ActionsObservable<Action>, store: { value: State.Root }) 
             return Observable.concat(
                 Observable.of(Actions.Media.playDone()),
                 Observable.timer(0, 1000 / store.value.media.captureFrameRate).pipe(
+                    takeWhile(() => !videoNode.paused),
                     mergeMap(() => Observable.of(Actions.Media.progressUpdate(videoNode.currentTime)).pipe(
                         takeWhile(observable => store.value.media.state == 'playing')
                 ))),
@@ -208,6 +209,22 @@ const removeResource = (action$: ActionsObservable<Action>, store: { value: Stat
         })
     )
 
+const restoreOnSwap = (action$: ActionsObservable<Action>, store: { value: State.Root }) =>
+    action$.ofType('epics_swapped').pipe(
+        mergeMap((action: Action) => {
+            const elementId = store.value.media.elementId
+            if(!elementId){ return Observable.empty() }
+
+            const videoNode = window.document.getElementById(elementId) as HTMLVideoElement
+            if(!videoNode){
+                console.warn(`Element with id:${elementId} not found`)
+                return Observable.empty()
+            }
+
+            return !videoNode.paused ? Observable.of(Actions.Media.play()) : Observable.empty()
+        })
+    )
+
 export const mediaEpics = combineEpics(
     loadSource,
     reloadSourceIfNeeded,
@@ -215,5 +232,7 @@ export const mediaEpics = combineEpics(
 
     play,
     pause,
-    rewindToStart
+    rewindToStart,
+
+    restoreOnSwap
 )

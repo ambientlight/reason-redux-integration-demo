@@ -63,6 +63,7 @@ const configureStore = (history: History) => {
             module.hot.accept('./epics/root', () => {
                 const rootEpicsModule = require('./epics/root')
                 epic$.next(rootEpicsModule.rootEpics)
+                store.dispatch({ type: 'epics_swapped' })
             })
         } else {
             module.hot.decline('./epics/root')
