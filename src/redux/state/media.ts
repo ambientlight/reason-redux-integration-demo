@@ -14,6 +14,8 @@ export interface Media {
     // file path or chrome media source id
     sourceIdentifier: string | null
 
+    objectUrl: string | null
+    
     // target element id displaying video content    
     elementId: string | null
 
@@ -33,6 +35,7 @@ export const initial: () => Media = () => ({
     state: MediaState.NotLoaded,
     isMediaReloading: false,
     sourceIdentifier: null,
+    objectUrl: null,
     elementId: null,
     captureFrameRate: 10,
     progress: 0,

@@ -15,7 +15,8 @@ export const media = (lastState: State.Media = initial(), action: Actions.Media.
                 elementId: action.elementId,
                 sourceIdentifier: action.sourceIdentifier,
                 duration: action.duration || 0,
-                state: MediaState.NotPlaying
+                state: MediaState.NotPlaying,
+                objectUrl: action.objectURL
             }
         case Actions.Media.ActionType.playDone:
             return { ...lastState, state: MediaState.Playing }
@@ -35,7 +36,11 @@ export const media = (lastState: State.Media = initial(), action: Actions.Media.
         case Actions.Media.ActionType.reloadSourceStarted:
             return { ...lastState, isMediaReloading: true }
         case Actions.Media.ActionType.reloadSourceDone:
-            return { ...lastState, isMediaReloading: false }
+            return { 
+                ...lastState, 
+                isMediaReloading: false,
+                objectUrl: action.objectURL
+            }
 
         case Actions.Media.ActionType.removeResourceDone:
             return initial()

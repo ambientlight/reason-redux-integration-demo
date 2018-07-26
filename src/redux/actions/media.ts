@@ -48,7 +48,8 @@ export interface LoadSourceAction extends _LoadSourceBase {
 
 export interface LoadSourceDoneAction extends _LoadSourceBase {
     type: ActionType.loadSourceDone,
-    duration: number | null
+    duration: number | null,
+    objectURL: string
 }
 
 export interface LoadSourceErrorAction extends _LoadSourceBase {
@@ -68,7 +69,10 @@ export interface RewindToStartDoneAction extends Action { type: ActionType.rewin
 export interface RewindToStartErrorAction extends Action { type: ActionType.rewindToStartError, error: any }
 export interface ReloadSourceIfNeededAction extends Action { type: ActionType.reloadSourceIfNeeded }
 export interface ReloadSourceStartedAction extends Action { type: ActionType.reloadSourceStarted }
-export interface ReloadSourceDoneAction extends Action { type: ActionType.reloadSourceDone }
+export interface ReloadSourceDoneAction extends Action { 
+    type: ActionType.reloadSourceDone,
+    objectURL: string
+}
 
 export interface ProgressUpdateAction extends Action {
     type: ActionType.progressUpdate,
@@ -89,10 +93,11 @@ export const loadVideoSourceFromFile = (filePath: string, elementId: string): Lo
     elementId: elementId
 })
 
-export const loadSourceDone = (loadSourceAction: LoadSourceAction, duration: number | null): LoadSourceDoneAction => ({ 
+export const loadSourceDone = (loadSourceAction: LoadSourceAction, duration: number | null, objectURL: string): LoadSourceDoneAction => ({ 
     ...loadSourceAction,
     type: ActionType.loadSourceDone,
-    duration: duration
+    duration: duration,
+    objectURL
 })
 
 export const loadSourceError = (loadSourceAction: LoadSourceAction, error: string): LoadSourceErrorAction => ({
@@ -103,7 +108,10 @@ export const loadSourceError = (loadSourceAction: LoadSourceAction, error: strin
 
 export const reloadSourceIfNeeded = (): ReloadSourceIfNeededAction => ({ type: ActionType.reloadSourceIfNeeded })
 export const reloadSourceStarted = (): ReloadSourceStartedAction => ({ type: ActionType.reloadSourceStarted })
-export const reloadSourceDone = (): ReloadSourceDoneAction => ({ type: ActionType.reloadSourceDone }) 
+export const reloadSourceDone = (objectURL: string): ReloadSourceDoneAction => ({ 
+    type: ActionType.reloadSourceDone, 
+    objectURL 
+}) 
 
 export const play = (): PlayAction => ({ type: ActionType.play })
 export const playDone = (): PlayDoneAction => ({ type: ActionType.playDone })
@@ -121,4 +129,8 @@ export const progressUpdate = (progress: number): ProgressUpdateAction => ({
     progress: progress
 })
 
+export const removeResource = (resourcePath: string): RemoveResourceAction => ({ 
+    type: ActionType.removeResource,  
+    resourcePath
+})
 export const removeResourceDone = (): RemoveResourceDoneAction => ({ type: ActionType.removeResourceDone })

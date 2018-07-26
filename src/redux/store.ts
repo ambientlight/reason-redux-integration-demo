@@ -6,7 +6,7 @@ import { persistStore, persistReducer, createMigrate } from 'redux-persist'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { createEpicMiddleware, combineEpics } from 'redux-observable'
 
-import { root, RootReducerModule } from './reducers/root'
+import { root, RootReducerModule, storage } from './reducers/root'
 import { rootEpics } from './epics/root'
 import { migrations } from './store-migrations'
 
@@ -17,16 +17,16 @@ const reduxModule = require('redux');
 reduxModule.__DO_NOT_USE__ActionTypes.INIT = '@@redux/INIT';
 reduxModule.__DO_NOT_USE__ActionTypes.REPLACE = '@@redux/REPLACE';
 
-const createElectronStorage = require("redux-persist-electron-storage").default
 const persistConfig = {
     key: 'root',
     version: 26,
-    storage: createElectronStorage(),
+    storage,
+    // nested persist is used to persist media, so its ignored it here, check ./reducers/root
+    blacklist: ['media'],
     migrate: createMigrate(migrations, { debug: true })
 }
 
 const epicMiddleware = createEpicMiddleware()
-
 const configureStore = (history: History) => {
     
     const store = createStore(
@@ -48,7 +48,6 @@ const configureStore = (history: History) => {
     )
 
     epicMiddleware.run(hotReloadingEpic as any)
-
     
     // Enable Webpack hot module replacement for reducers and middware(if needed)
     if (module.hot) {

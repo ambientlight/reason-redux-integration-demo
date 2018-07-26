@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import { Observable } from 'rxjs/Observable'
-import { map, mergeMap, takeWhile, catchError, first } from 'rxjs/operators'
+import { map, mergeMap, takeWhile, catchError, first, tap } from 'rxjs/operators'
 import 'rxjs/add/observable/empty'
 import 'rxjs/add/observable/concat'
 import 'rxjs/add/observable/merge'
@@ -8,6 +8,7 @@ import 'rxjs/add/observable/of'
 import 'rxjs/add/observable/timer'
 import 'rxjs/add/observable/throw'
 import 'rxjs/add/observable/fromEvent'
+import 'rxjs/add/observable/interval'
 import { combineEpics, ActionsObservable } from 'redux-observable'
 import { Action } from 'redux'
 
@@ -16,20 +17,38 @@ import * as State from '../state'
 import { storeDescriptor } from '../store'
 
 
-const loadSourceFromFile = (filePath: string, videoElement: HTMLVideoElement): Observable<number> => new Observable(subscriber => 
+const loadSourceFromFile = (filePath: string, videoElement: HTMLVideoElement): Observable<{ duration: number, objectUrl: string }> => new Observable(subscriber =>
     fs.readFile(filePath, (error, data) => {
         const blob = new Blob([data], { type: 'video/mp4'})
+        const objectUrl = URL.createObjectURL(blob)      
         videoElement.onloadeddata = event => {
-            subscriber.next(videoElement.duration)
+            subscriber.next({ duration: videoElement.duration, objectUrl })
             subscriber.complete()
         }
 
         videoElement.onerror = errorEvent => { 
+            console.log('got error on loading from object url')
             subscriber.error(errorEvent) 
         }
-        videoElement.src = URL.createObjectURL(blob)
+
+        videoElement.src = objectUrl
     })
 )
+
+
+const loadSourceFromObjectUrl = (objectUrl: string, videoElement: HTMLVideoElement): Observable<{ duration: number, objectUrl: string }> => new Observable(subscriber => {
+    videoElement.onloadeddata = event => {
+        subscriber.next({ duration: videoElement.duration, objectUrl })
+        subscriber.complete()
+    }
+
+    videoElement.onerror = errorEvent => { 
+        console.log('got error on loading from object url')
+        subscriber.error(errorEvent) 
+    }
+
+    videoElement.src = objectUrl
+})
 
 const loadSource = (action$: ActionsObservable<Action>, store: { value: State.Root }): Observable<Actions.Media.LoadSourceDoneAction | Actions.Media.LoadSourceErrorAction> =>
     action$.ofType(Actions.Media.ActionType.loadSource).pipe(
@@ -43,11 +62,11 @@ const loadSource = (action$: ActionsObservable<Action>, store: { value: State.Ro
             return (() => { switch(action.sourceType){
                 case 'file': return loadSourceFromFile(action.sourceIdentifier, videoNode)
             }})().pipe(
-                mergeMap((durationOrNull) => {
+                mergeMap(({ duration, objectUrl }) => {
                     videoNode.currentTime = store.value.media.progress;
                     return Observable.fromEvent(videoNode, 'seeked').pipe(
                         first(), 
-                        map(() => Actions.Media.loadSourceDone(action, durationOrNull))
+                        map(() => Actions.Media.loadSourceDone(action, duration, objectUrl))
                     )
                 }),
                 catchError(error => Observable.of(Actions.Media.loadSourceError(action, error)))
@@ -152,14 +171,16 @@ const reloadSourceIfNeeded = (action$: ActionsObservable<Action>, store: { value
 
             return Observable.concat(
                 Observable.of(Actions.Media.reloadSourceStarted()), 
-
-                loadSourceFromFile(sourceIdentifier, videoNode).pipe(
-                    mergeMap(durationOrNull => {
+                (store.value.media.objectUrl 
+                    ? loadSourceFromObjectUrl(store.value.media.objectUrl, videoNode) 
+                    : loadSourceFromFile(sourceIdentifier, videoNode)
+                ).pipe(
+                    mergeMap(({ duration, objectUrl })=> {
                         videoNode.currentTime = store.value.media.progress
                         // turn loaded emission into pause so if reload happened during play, state will update accordingly
                         // alternatively we could turn emission into Actions.Media.loadSourceDone as in standard load
                         return Observable.concat(
-                            Observable.of(Actions.Media.reloadSourceDone()), 
+                            Observable.of(Actions.Media.reloadSourceDone(objectUrl)), 
                             Observable.of(Actions.Media.pause()))
                     })
                 )
