@@ -68,6 +68,9 @@ const configureStore = (history: History) => {
         } else {
             module.hot.decline('./epics/root')
         }
+
+        // decline hot reload for store
+        module.hot.decline()
     }
 
     return { store, persistor: persistStore(store) }
